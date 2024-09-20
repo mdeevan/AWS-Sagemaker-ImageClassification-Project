@@ -10,6 +10,8 @@ import torchvision.transforms as transforms
 
 import argparse
 
+
+
 def test(model, test_loader):
     '''
     TODO: Complete this function that can take a model and a 
@@ -24,6 +26,40 @@ def train(model, train_loader, criterion, optimizer):
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+
+
+    epochs = 2
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        
+    for e in epochs:
+
+        running_loss = 0
+        correct = 0
+        
+        for data, target in train_loader:
+            data   = data.to_device(device)
+            target = target.to_device(device)
+
+            optimizer.zero_grad()
+
+            pred = model(data)
+            loss = criterion(pred, target)
+            running_loss += loss
+        
+            loss.backward()
+            optimizer.step()
+
+            pred = pred.argmax(dim=1, keepdim=True)
+
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+            total_loss = running_loss / len(train_loader.dataset)
+            accuracy = correct / len(train_loader.dataset)
+            
+            print("epoch : {}, total loss : {}, accuracy :{}%".format(e, total_loss, accuracy))
+            
+    
     pass
     
 def net():
@@ -31,7 +67,20 @@ def net():
     TODO: Complete this function that initializes your model
           Remember to use a pretrained model
     '''
-    pass
+
+    model = torchvision.models.detection.ResNet50_Weights()
+
+    for params in model.parameters:
+        params.requires_grad = False
+
+    num_features = model.fc.in_features()
+    num_classes = 100
+
+    model.fc = nn.Sequential(
+        nn.Linear(num_features, num_classes)
+    )
+
+    return model
 
 def create_data_loaders(data, batch_size):
     '''
