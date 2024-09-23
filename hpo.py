@@ -97,6 +97,9 @@ def create_data_loaders(data, batch_size):
     pass
 
 def main(args):
+
+    
+    
     '''
     TODO: Initialize a model by calling the net function
     '''
