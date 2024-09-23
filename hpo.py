@@ -8,8 +8,14 @@ import torchvision
 import torchvision.models as models
 import torchvision.transforms as transforms
 
+
 import argparse
 
+def get_pretained_model_ResNet50():
+    weights = models.ResNet50_Weights()
+    model = models.resnet50(weights=weights)
+
+    return model
 
 
 def test(model, test_loader):
@@ -56,25 +62,26 @@ def train(model, train_loader, criterion, optimizer):
 
             total_loss = running_loss / len(train_loader.dataset)
             accuracy = correct / len(train_loader.dataset)
-            
+
             print("epoch : {}, total loss : {}, accuracy :{}%".format(e, total_loss, accuracy))
             
     
     pass
     
-def net():
+def net(num_classes = 100):
     '''
     TODO: Complete this function that initializes your model
           Remember to use a pretrained model
     '''
 
-    model = torchvision.models.detection.ResNet50_Weights()
+    # model = torchvision.models.detection.ResNet50_Weights()
+    model = get_pretained_model_ResNet50
 
     for params in model.parameters:
         params.requires_grad = False
 
     num_features = model.fc.in_features()
-    num_classes = 100
+    # num_classes = 100
 
     model.fc = nn.Sequential(
         nn.Linear(num_features, num_classes)
